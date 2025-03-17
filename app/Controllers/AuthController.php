@@ -42,6 +42,7 @@ class AuthController
 
     public function register()
     {
+       
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fullName    = trim($_POST['username']);
             $email       = trim($_POST['email']);
@@ -49,7 +50,7 @@ class AuthController
             $password    = $_POST['password'];
             $address     = trim($_POST['address']);
             $district    = trim($_POST['district']);
-            $street      = trim($_POST['direction']);
+            $street  = trim($_POST['street']);
             
             // Basic validation: Ensure all fields are filled
             if (empty($fullName) || empty($email) || empty($phoneNumber) || empty($password) ||
@@ -73,7 +74,7 @@ class AuthController
                     $street
                 );
                 $_SESSION['success'] = "تم إنشاء الحساب بنجاح";
-                header("Location: " . gotolink('login'));
+                header("Location: " . gotolink(name: 'student.home'));
                 exit;
             } catch (\Exception $e) {
                 $_SESSION['error'] = $e->getMessage();

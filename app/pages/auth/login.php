@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -74,11 +74,27 @@
     </style>
 </head>
 
-<body class="bg-cover bg-center flex justify-center items-center flex-col overflow-hidden h-screen " style="background-image:  url('<?php echo asset('images/10.jpeg') ; ?>');">
+<body class="bg-cover bg-center flex justify-center items-center flex-col overflow-hidden h-screen " style="background-image:  url('<?php echo asset('images/10.jpeg'); ?>');">
+
+    <?php
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (isset($_SESSION['success'])) {
+        echo "<div class='mb-4 p-4 bg-green-200 text-green-800 rounded'>{$_SESSION['success']}</div>";
+        unset($_SESSION['success']);
+    }
+
+    if (isset($_SESSION['error'])) {
+        echo "<div class='mb-4 p-4 bg-red-200 text-red-800 rounded'>{$_SESSION['error']}</div>";
+        unset($_SESSION['error']);
+    }
+    ?>
     <div class="relative w-[768px] max-w-full min-h-[500px] rounded-2xl shadow-2xl overflow-hidden bg-white" id="container">
         <!-- Login Form Container -->
         <div id="loginContainer" class="login-container flex flex-col items-center justify-center px-12 h-full text-center">
-            <form id="loginForm" method="post" href="<?= gotolink('login'); ?>" class="w-full max-w-sm mx-auto"  dir="rtl">
+            <form id="loginForm" method="post" href="<?= gotolink('login'); ?>" class="w-full max-w-sm mx-auto" dir="rtl">
                 <input type="hidden" name="form_type" value="login">
                 <h1 class="font-bold text-4xl text-shadow mb-4">تسجيل الدخول</h1>
                 <div class="w-full relative mb-4">
@@ -151,38 +167,44 @@
                     <small class="text-red-500 text-xs absolute top-full left-0"></small>
                 </div>
                 <div class="w-full mb-4 flex flex-col md:flex-row gap-4">
+
+                    <div class="w-full relative">
+                        <input type="text" name="address" placeholder="العنوان" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                        <small class="text-red-500 text-xs"></small>
+                    </div>
                     <div class="w-full relative">
                         <input type="text" name="district" placeholder="الحي" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
                         <small class="text-red-500 text-xs"></small>
                     </div>
                     <div class="w-full relative">
-                        <input type="text" name="direction" placeholder="الشارع" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                        <input type="text" name="street" placeholder="الشارع" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
                         <small class="text-red-500 text-xs"></small>
                     </div>
+
                 </div>
                 <button type="submit" class="relative rounded-full border border-[#006c67] bg-[#006c67] text-white font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out hover:tracking-wider active:scale-95 focus:outline-none">
                     تسجيل
                 </button>
             </form>
-        </div> 
+        </div>
         <!-- Overlay Container -->
         <div class="absolute top-0 left-1/2 w-1/2 h-full overflow-hidden transition-transform duration-600 ease-in-out overlay-container">
             <div class="relative left-[-100%] w-[200%] h-full transition-transform duration-600 ease-in-out overlay" style="background-image: url('IMG_7038.jpeg'); background-repeat: no-repeat; background-size: cover; background-position: 0 0;">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#2e5e6d]/40 via-transparent"></div>
-            <div class="absolute top-0 left-0 w-1/2 h-full flex flex-col items-center justify-center px-10 text-center transition-transform duration-600 ease-in-out overlay-panel overlay-left transform -translate-x-[20%]">
-                <h1 class="font-bold text-4xl text-shadow mb-4">مرحبًا</h1>
-                <p class="text-md text-shadow mb-4">مرحبًا بعودتك! هل أنت جاهز لتجربة تنقل جامعي أكثر سلاسة؟<br /><br />دع Masary يسهل رحلتك!</p>
-                <button class="ghost relative rounded-full border-2 border-teal-500 bg-[rgba(255,255,255,0.2)] text-teal-500 font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out focus:outline-none" id="loginToggle">
-                تسجيل الدخول
-                </button>
-            </div>
-            <div class="absolute top-0 right-0 w-1/2 h-full flex flex-col items-center justify-center px-10 text-center transition-transform duration-600 ease-in-out overlay-panel overlay-right transform translate-x-0">
-                <h1 class="font-bold text-4xl text-shadow mb-4">ابدأ رحلتك الآن</h1>
-                <p class="text-md text-shadow mb-4">انضم إلى Masary واجعل تنقلك الجامعي أسهل وأسرع!</p>
-                <button class="ghost relative rounded-full border-2 border-teal-500 bg-[rgba(255,255,255,0.2)] text-teal-500 font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out focus:outline-none" id="registerToggle">
-                تسجيل
-                </button>
-            </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#2e5e6d]/40 via-transparent"></div>
+                <div class="absolute top-0 left-0 w-1/2 h-full flex flex-col items-center justify-center px-10 text-center transition-transform duration-600 ease-in-out overlay-panel overlay-left transform -translate-x-[20%]">
+                    <h1 class="font-bold text-4xl text-shadow mb-4">مرحبًا</h1>
+                    <p class="text-md text-shadow mb-4">مرحبًا بعودتك! هل أنت جاهز لتجربة تنقل جامعي أكثر سلاسة؟<br /><br />دع Masary يسهل رحلتك!</p>
+                    <button class="ghost relative rounded-full border-2 border-teal-500 bg-[rgba(255,255,255,0.2)] text-teal-500 font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out focus:outline-none" id="loginToggle">
+                        تسجيل الدخول
+                    </button>
+                </div>
+                <div class="absolute top-0 right-0 w-1/2 h-full flex flex-col items-center justify-center px-10 text-center transition-transform duration-600 ease-in-out overlay-panel overlay-right transform translate-x-0">
+                    <h1 class="font-bold text-4xl text-shadow mb-4">ابدأ رحلتك الآن</h1>
+                    <p class="text-md text-shadow mb-4">انضم إلى Masary واجعل تنقلك الجامعي أسهل وأسرع!</p>
+                    <button class="ghost relative rounded-full border-2 border-teal-500 bg-[rgba(255,255,255,0.2)] text-teal-500 font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out focus:outline-none" id="registerToggle">
+                        انشاء حساب
+                    </button>
+                </div>
             </div>
         </div>
     </div>

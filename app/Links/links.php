@@ -5,19 +5,19 @@ function middleware($middleware, $callback)
 {
     return function () use ($middleware, $callback) {
         // 'auth_student' middleware: Check if the user is logged in as a student.
-        // if ($middleware === 'auth_student') {
-        //     if (!auth()->isStudent()) {
-        //         header("Location: " . gotolink('login'));
-        //         exit;
-        //     }
-        // }
-        // // 'auth_admin' middleware: Check if the user is logged in and is an admin.
-        // if ($middleware === 'auth_admin') {
-        //     if (!auth()->isAdmin()) {
-        //         header("Location: " . gotolink('home'));
-        //         exit;
-        //     }
-        // }
+        if ($middleware === 'auth_student') {
+            if (!auth()->isStudent()) {
+                header("Location: " . gotolink('login'));
+                exit;
+            }
+        }
+        // 'auth_admin' middleware: Check if the user is logged in and is an admin.
+        if ($middleware === 'auth_admin') {
+            if (!auth()->isAdmin()) {
+                header("Location: " . gotolink('home'));
+                exit;
+            }
+        }
         // If all checks pass, call the route callback.
         $callback();
     };
@@ -36,7 +36,15 @@ $routes = [
     'login'    => function () {
         $controller = new AuthController();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $controller->login();
+            if($_POST['form_type']=="register")
+            {
+                $controller->register();
+            }
+            if($_POST['form_type']=="login")
+            {
+                $controller->login();
+            }
+            
         } else {
             page('auth/login');
         }
@@ -46,7 +54,7 @@ $routes = [
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $controller->register();
         } else {
-            page('auth/register');
+            page('auth/login');
         }
     },
     'logout'   => function () {
@@ -123,7 +131,7 @@ $routes = [
         $controller = new AdminController();
         $controller->deleteBooking($id);
     }),
-    'student.dashboard'    => function() {
+    'student.home'    => function() {
         $controller = new StudentController();
         $controller->dashboard();
     },
@@ -139,10 +147,7 @@ $routes = [
         $controller = new StudentController();
         $controller->bookedTrips();
     },
-    'student.reports'      => function() {
-        $controller = new StudentController();
-        $controller->reports();
-    },
+  
     'student.profile'      => function() {
         $controller = new StudentController();
         $controller->profile();
@@ -151,10 +156,7 @@ $routes = [
         $controller = new StudentController();
         $controller->editProfile();
     },
-    'student.settings'     => function() {
-        $controller = new StudentController();
-        $controller->settings();
-    },
+   
     'student.delete_account' => function() {
         $controller = new StudentController();
         $controller->deleteAccount();

@@ -70,23 +70,7 @@ class StudentController {
         page('student/booked_trips');
     }
 
-    /**
-     * Show the student's reports.
-     */
-    public function reports()
-    {
-        page('student/reports');
-    }
-
    
-
-    /**
-     * Show the student's requests.
-     */
-    public function requests()
-    {
-        page('student/requests');
-    }
 
     /**
      * Show available challenges.
@@ -110,35 +94,78 @@ class StudentController {
     public function editProfile()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Process profile update, then redirect.
-            // (Your update logic goes here)
+            // Retrieve the current student from your authentication helper.
+            $student = auth()->student();
+            echo $student->name;
+            if (!$student) {
+                $_SESSION['error'] = "المستخدم غير موجود.";
+                header("Location: " . gotolink('login'));
+                exit;
+            }
+    
+            // Sanitize and update student data.
+            $data = [
+                'name' => trim($_POST['fullName'] ?? ''),
+                'email'    => trim($_POST['email'] ?? ''),
+                'phone'    => trim($_POST['phone'] ?? ''),
+                'address'  => trim($_POST['address'] ?? ''),
+                'district' => trim($_POST['district'] ?? ''),
+                'street'   => trim($_POST['street'] ?? ''),
+            ];
+    
+            // Check required fields.
+            foreach ($data as $field => $value) {
+                if ($value === '') {
+                    $_SESSION['error'] = "جميع الحقول مطلوبة.";
+                    header("Location: " . gotolink('student.edit_profile'));
+                    exit;
+                }
+            }
+    
+            // Update properties using fill (or set individually).
+            $student->fill($data);
+    
+            // If password is provided, update it.
+            if (!empty($_POST['password'])) {
+                $student->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            }
+    
+            // Attempt to save changes.
+            if ($student->save()) {
+                $_SESSION['success'] = "تم تحديث الملف الشخصي بنجاح";
+            } else {
+                $_SESSION['error'] = "فشل تحديث الملف الشخصي";
+            }
             header("Location: " . gotolink('student.profile'));
             exit;
         } else {
+            // If not POST, show the edit profile form.
             page('student/edit_profile');
         }
     }
-
-    /**
-     * Show the student's settings.
-     */
-    public function settings()
-    {
-        page('student/settings');
-    }
-
-    /**
-     * Delete the student's account.
-     */
+    
     public function deleteAccount()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Process account deletion (call your auth helper or model method)
-            // Then redirect to logout
+            // Retrieve the authenticated student.
+            $student = auth()->student();
+            if (!$student) {
+                $_SESSION['error'] = "المستخدم غير موجود.";
+                header("Location: " . gotolink('login'));
+                exit;
+            }
+            // Attempt to delete the account.
+            if ($student->delete()) {
+                $_SESSION['success'] = "تم حذف الحساب بنجاح";
+            } else {
+                $_SESSION['error'] = "فشل حذف الحساب";
+            }
             header("Location: " . gotolink('logout'));
             exit;
         } else {
+            // If not POST, show a confirmation page.
             page('student/delete_account');
         }
     }
+    
 }

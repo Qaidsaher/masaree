@@ -35,7 +35,7 @@ $user = auth()->student(); // Assuming auth()->student() returns the current stu
       <span><?= htmlspecialchars($user->street); ?></span>
     </div>
   </div>
-  <div class="mt-6 text-center">
+  <div class="mt-6 text-left">
     <a href="<?= gotolink('student.edit_profile'); ?>" class="inline-block bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded">
       <i class="fas fa-edit mr-2"></i> تعديل الملف
     </a>

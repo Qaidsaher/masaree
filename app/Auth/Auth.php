@@ -34,7 +34,7 @@ class Auth
      */
     public function check()
     {
-        return isset($_SESSION['user_id']) || isset($_SESSION['admin_id']);
+        return isset($_SESSION['student_id']) || isset($_SESSION['admin_id']);
     }
 
     /**
@@ -44,7 +44,7 @@ class Auth
      */
     public function isStudent()
     {
-        return isset($_SESSION['user_id']);
+        return isset($_SESSION['student_id']);
     }
 
     /**
@@ -65,7 +65,7 @@ class Auth
     public function student()
     {
         if ($this->isStudent()) {
-            return Student::find($_SESSION['user_id']);
+            return Student::find($_SESSION['student_id']);
         }
         return null;
     }
@@ -110,7 +110,7 @@ class Auth
             if (!empty($students)) {
                 $student = $students[0];
                 if (password_verify($password, $student->password)) {
-                    $_SESSION['user_id'] = $student->id;
+                    $_SESSION['student_id'] = $student->id;
                     session_regenerate_id(true);
                     return $student;
                 }
@@ -150,7 +150,7 @@ class Auth
             'street'   => $street
         ]);
         if ($student->save()) {
-            $_SESSION['user_id'] = $student->id;
+            $_SESSION['student_id'] = $student->id;
             session_regenerate_id(true);
             return $student;
         }
@@ -221,7 +221,7 @@ class Auth
             if (!$student) return false;
             $result = $student->delete();
             if ($result) {
-                unset($_SESSION['user_id']);
+                unset($_SESSION['student_id']);
             }
             return $result;
         } elseif ($this->isAdmin()) {
@@ -243,8 +243,8 @@ class Auth
      */
     public function logout()
     {
-        if (isset($_SESSION['user_id'])) {
-            unset($_SESSION['user_id']);
+        if (isset($_SESSION['student_id'])) {
+            unset($_SESSION['student_id']);
         }
         if (isset($_SESSION['admin_id'])) {
             unset($_SESSION['admin_id']);
