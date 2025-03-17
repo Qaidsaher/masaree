@@ -23,7 +23,7 @@ class DB
             try {
                 // Database configuration
                 $host     = 'localhost';
-                $dbname   = 'masaree';
+                $dbname   = 'mar';
                 $username = 'root';         // Change as necessary
                 $password = '';             // Change as necessary
                 $dsn      = "mysql:host=$host;dbname=$dbname;charset=utf8";

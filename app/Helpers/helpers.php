@@ -59,7 +59,47 @@ if (!function_exists('page')) {
             extract($data);
             include $viewFile;
         } else {
-            echo "View '{$name}' not found.";
+            echo "View '{$viewFile}' not found.";
+        }
+    }
+}
+if (!function_exists('admin_layout')) {
+    /**
+     * Loads the admin layout from the pages folder and passes the content and data.
+     *
+     * @param string $content The main content HTML to be injected into the layout.
+     * @param array $data An associative array of additional data (optional).
+     * @return void
+     */
+    function admin_layout($content, $data = [])
+    {
+        // Extract variables so they're available in the layout
+        extract($data);
+        // Build the full path to the admin layout file
+        $layoutFile = dirname(__DIR__) . '/pages/layout/admin.php';
+        if (file_exists($layoutFile)) {
+            // Make $content available to the layout file
+            include $layoutFile;
+        } else {
+            echo "Admin layout not found: " . $layoutFile;
+        }
+    }
+}
+if (!function_exists('user_layout')) {
+    /**
+     * Loads the user layout from the pages/layout directory.
+     *
+     * @param string $content The main content HTML.
+     * @param array $data Additional data (e.g., title).
+     */
+    function user_layout($content, $data = [])
+    {
+        extract($data);
+        $layoutFile = dirname(__DIR__) . '/pages/layout/user.php';
+        if (file_exists($layoutFile)) {
+            include $layoutFile;
+        } else {
+            echo "User layout file not found: " . $layoutFile;
         }
     }
 }

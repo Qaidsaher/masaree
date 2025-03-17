@@ -5,19 +5,19 @@ function middleware($middleware, $callback)
 {
     return function () use ($middleware, $callback) {
         // 'auth_student' middleware: Check if the user is logged in as a student.
-        if ($middleware === 'auth_student') {
-            if (!auth()->isStudent()) {
-                header("Location: " . gotolink('login'));
-                exit;
-            }
-        }
-        // 'auth_admin' middleware: Check if the user is logged in and is an admin.
-        if ($middleware === 'auth_admin') {
-            if (!auth()->isAdmin()) {
-                header("Location: " . gotolink('home'));
-                exit;
-            }
-        }
+        // if ($middleware === 'auth_student') {
+        //     if (!auth()->isStudent()) {
+        //         header("Location: " . gotolink('login'));
+        //         exit;
+        //     }
+        // }
+        // // 'auth_admin' middleware: Check if the user is logged in and is an admin.
+        // if ($middleware === 'auth_admin') {
+        //     if (!auth()->isAdmin()) {
+        //         header("Location: " . gotolink('home'));
+        //         exit;
+        //     }
+        // }
         // If all checks pass, call the route callback.
         $callback();
     };
@@ -31,7 +31,7 @@ use App\Controllers\StudentController;
 $routes = [
     // Public routes
     'home'     => function () {
-        page('home');
+        page('admin/admins'); // Adjust as needed
     },
     'login'    => function () {
         $controller = new AuthController();
@@ -55,53 +55,77 @@ $routes = [
         exit;
     },
 
-    // Student routes (require student authentication)
-    'student.home' => middleware('auth_student', function () {
-        $controller = new StudentController();
-        $controller->index();
-    }),
-    'student.trips' => middleware('auth_student', function () {
-        $controller = new StudentController();
-        $controller->viewTrips();
-    }),
-    'student.book_trip' => middleware('auth_student', function () {
-        $controller = new StudentController();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $controller->bookTrip();
-        } else {
-            // Display the trip booking form (adjust as needed)
-            page('student/book_trip');
-        }
-    }),
-
     // Admin routes (require admin authentication)
     'admin.home' => middleware('auth_admin', function () {
         $controller = new AdminController();
         $controller->index();
     }),
+    'admin.students' => middleware('auth_admin', function () {
+        $controller = new AdminController();
+        $controller->manageStudents();
+    }),
+    'admin.students.delete' => middleware('auth_admin', function () {
+        $id = $_GET['id'] ?? null;
+        $controller = new AdminController();
+        $controller->deleteStudent($id);
+    }),
+    'admin.admins' => middleware('auth_admin', function () {
+        $controller = new AdminController();
+        $controller->manageAdmins();
+    }),
+    'admin.admins.delete' => middleware('auth_admin', function () {
+        $id = $_GET['id'] ?? null;
+        $controller = new AdminController();
+        $controller->deleteAdmin($id);
+    }),
     'admin.drivers' => middleware('auth_admin', function () {
         $controller = new AdminController();
         $controller->manageDrivers();
+    }),
+    'admin.drivers.delete' => middleware('auth_admin', function () {
+        $id = $_GET['id'] ?? null;
+        $controller = new AdminController();
+        $controller->deleteDriver($id);
     }),
     'admin.buses' => middleware('auth_admin', function () {
         $controller = new AdminController();
         $controller->manageBuses();
     }),
+    'admin.buses.delete' => middleware('auth_admin', function () {
+        $id = $_GET['id'] ?? null;
+        $controller = new AdminController();
+        $controller->deleteBus($id);
+    }),
     'admin.routes' => middleware('auth_admin', function () {
         $controller = new AdminController();
         $controller->manageRoutes();
+    }),
+    'admin.routes.delete' => middleware('auth_admin', function () {
+        $id = $_GET['id'] ?? null;
+        $controller = new AdminController();
+        $controller->deleteRoute($id);
     }),
     'admin.trips' => middleware('auth_admin', function () {
         $controller = new AdminController();
         $controller->manageTrips();
     }),
+    'admin.trips.delete' => middleware('auth_admin', function () {
+        $id = $_GET['id'] ?? null;
+        $controller = new AdminController();
+        $controller->deleteTrip($id);
+    }),
     'admin.bookings' => middleware('auth_admin', function () {
         $controller = new AdminController();
         $controller->manageBookings();
     }),
+    'admin.bookings.delete' => middleware('auth_admin', function () {
+        $id = $_GET['id'] ?? null;
+        $controller = new AdminController();
+        $controller->deleteBooking($id);
+    }),
 ];
 
-$route = isset($_GET['route']) ? $_GET['route'] : 'home';
+$route = isset($_GET['goto']) ? $_GET['goto'] : 'home';
 if (isset($routes[$route]) && is_callable($routes[$route])) {
     $routes[$route]();
 } else {
