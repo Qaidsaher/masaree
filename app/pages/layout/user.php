@@ -26,7 +26,7 @@ $isAuth = !isset($_SESSION['student']);
     }
   </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-800">
+<body class="bg-gray-50 ">
   <!-- Navbar -->
   <nav class="bg-teal-600 bg-pattern border-b border-teal-700">
     <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">

@@ -10,9 +10,9 @@ class AuthController
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email    = trim($_POST['email']);
-            $password = $_POST['password'];
-            $userType = $_POST['user_type']; // Expected values: "student" or "admin"
+            $email    = trim($_POST['loginEmail']);
+            $password = $_POST['loginPassword'];
+            $userType = $_POST['userType']; // Expected values: "student" or "admin"
 
             // Basic validation could be added here
 
@@ -43,22 +43,14 @@ class AuthController
     public function register()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $fullName    = trim($_POST['fullName']);
+            $fullName    = trim($_POST['username']);
             $email       = trim($_POST['email']);
-            $phoneNumber = trim($_POST['phoneNumber']);
+            $phoneNumber = trim($_POST['studentId']);
             $password    = $_POST['password'];
             $address     = trim($_POST['address']);
             $district    = trim($_POST['district']);
-            $street      = trim($_POST['street']);
-            $userType    = $_POST['user_type'] ?? 'student'; // Registration allowed only for students
-
-            // Public registration is allowed only for students.
-            if ($userType !== 'student') {
-                $_SESSION['error'] = "لا يمكن التسجيل كأدمن عبر الواجهة العامة.";
-                header("Location: " . gotolink('register'));
-                exit;
-            }
-
+            $street      = trim($_POST['direction']);
+            
             // Basic validation: Ensure all fields are filled
             if (empty($fullName) || empty($email) || empty($phoneNumber) || empty($password) ||
                 empty($address) || empty($district) || empty($street)) {

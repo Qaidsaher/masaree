@@ -103,3 +103,14 @@ if (!function_exists('user_layout')) {
         }
     }
 }
+if (!function_exists('student_layout')) {
+    function student_layout($content, $data = []) {
+        extract($data);
+        $layoutFile = dirname(__DIR__) . '/pages/layout/student.php';
+        if (file_exists($layoutFile)) {
+            include $layoutFile;
+        } else {
+            echo "Student layout file not found: " . $layoutFile;
+        }
+    }
+}

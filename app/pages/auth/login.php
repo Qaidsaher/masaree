@@ -1,149 +1,235 @@
-<?php
-use App\Tables\Route;
+<!DOCTYPE html>
+<html lang="en" >
 
-$active = 'admin.routes';
-$title = 'إدارة الطرق - لوحة الإدارة';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['form_action'] ?? '';
-    $data = [
-        'start_location' => trim($_POST['start_location'] ?? ''),
-        'end_location'   => trim($_POST['end_location'] ?? ''),
-        'description'    => trim($_POST['description'] ?? '')
-    ];
-    foreach ($data as $key => $value) {
-        if ($value === '') {
-            $_SESSION['error'] = "جميع الحقول مطلوبة.";
-            header("Location: " . gotolink('admin.routes', ['action' => $action, 'id' => $_POST['id'] ?? null]));
-            exit;
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Andev Web - Validate Form</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
         }
-    }
-    
-    if ($action === 'create') {
-        $route = new Route($data);
-        $_SESSION['success'] = $route->save() ? "تم إنشاء الطريق بنجاح" : "فشل إنشاء الطريق";
-    } elseif ($action === 'edit') {
-        $id = $_POST['id'] ?? null;
-        if ($id) {
-            $route = Route::find($id);
-            if ($route) {
-                $route->start_location = $data['start_location'];
-                $route->end_location = $data['end_location'];
-                $route->description = $data['description'];
-                $_SESSION['success'] = $route->save() ? "تم تعديل بيانات الطريق بنجاح" : "فشل تعديل بيانات الطريق";
-            } else {
-                $_SESSION['error'] = "الطريق غير موجود";
-            }
+
+        .text-shadow {
+            text-shadow: 0 0 10px rgba(16, 64, 74, 0.5);
         }
-    }
-    header("Location: " . gotolink('admin.routes'));
-    exit;
-}
 
-ob_start();
-$viewAction = $_GET['action'] ?? 'list';
-if ($viewAction === 'edit' && isset($_GET['id'])) {
-    $editRoute = Route::find($_GET['id']);
-    if (!$editRoute) {
-        $_SESSION['error'] = "الطريق غير موجود";
-        header("Location: " . gotolink('admin.routes'));
-        exit;
-    }
-}
-?>
+        .right-panel-active .login-container {
+            transform: translateX(100%);
+            opacity: 0;
+        }
 
-<div class="mb-6 flex justify-between items-center">
-    <h1 class="text-3xl font-bold text-teal-700">إدارة الطرق</h1>
-    <?php if ($viewAction === 'list'): ?>
-        <a href="<?= gotolink('admin.routes', ['action' => 'create']); ?>" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded">
-            <i class="fas fa-plus ml-2"></i> إضافة طريق جديد
-        </a>
-    <?php else: ?>
-        <a href="<?= gotolink('admin.routes'); ?>" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
-            <i class="fas fa-arrow-left ml-2"></i> الرجوع للقائمة
-        </a>
-    <?php endif; ?>
-</div>
+        .right-panel-active .register-container {
+            transform: translateX(0%);
+            opacity: 1;
+        }
 
-<?php if ($viewAction === 'list'): ?>
-    <?php $routes = Route::all(); ?>
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-teal-50">
-                <tr>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الرقم</th>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الموقع الابتدائي</th>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الموقع النهائي</th>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الوصف</th>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                <?php if (!empty($routes)): ?>
-                    <?php foreach ($routes as $route): ?>
-                        <tr>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($route->id); ?></td>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($route->start_location); ?></td>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($route->end_location); ?></td>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($route->description); ?></td>
-                            <td class="px-4 py-2 text-right">
-                                <a href="<?= gotolink('admin.routes', ['action' => 'edit', 'id' => $route->id]); ?>" class="text-blue-600 hover:underline mr-2">
-                                    <i class="fas fa-edit"></i> تعديل
-                                </a>
-                                <a href="<?= gotolink('admin.routes.delete', ['id' => $route->id]); ?>" class="text-red-600 hover:underline" onclick="return confirm('هل أنت متأكد من حذف الطريق؟');">
-                                    <i class="fas fa-trash-alt"></i> حذف
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="5" class="px-4 py-2 text-center text-gray-600">لا توجد طرق بعد.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-<?php elseif ($viewAction === 'create' || $viewAction === 'edit'):
-    $formTitle = ($viewAction === 'create') ? "إضافة طريق جديد" : "تعديل بيانات الطريق";
-    $routeData = [
-        'id'            => $viewAction === 'edit' ? $editRoute->id : '',
-        'start_location'=> $viewAction === 'edit' ? $editRoute->start_location : '',
-        'end_location'  => $viewAction === 'edit' ? $editRoute->end_location : '',
-        'description'   => $viewAction === 'edit' ? $editRoute->description : ''
-    ];
-?>
-    <div class="bg-white p-6 rounded-lg shadow max-w-3xl mx-auto">
-        <h2 class="text-2xl font-bold text-teal-700 mb-4"><?= $formTitle; ?></h2>
-        <form action="<?= gotolink('admin.routes'); ?>" method="POST" class="space-y-4">
-            <?php if ($viewAction === 'edit'): ?>
-                <input type="hidden" name="id" value="<?= htmlspecialchars($routeData['id']); ?>">
-            <?php endif; ?>
-            <input type="hidden" name="form_action" value="<?= $viewAction; ?>">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="start_location">الموقع الابتدائي</label>
-                    <input type="text" id="start_location" name="start_location" value="<?= htmlspecialchars($routeData['start_location']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+        .right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .right-panel-active .overlay-panel.overlay-left {
+            transform: translateX(0);
+        }
+
+        .right-panel-active .overlay-panel.overlay-right {
+            transform: translateX(20%);
+        }
+
+        .login-container,
+        .register-container {
+            transition: all 0.6s ease-in-out;
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+        }
+
+        .register-container {
+            left: 50%;
+            transform: translateX(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .login-container {
+            left: 0;
+        }
+
+        .right-panel-active .register-container {
+            pointer-events: auto;
+        }
+
+        .right-panel-active .login-container {
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-cover bg-center flex justify-center items-center flex-col overflow-hidden h-screen " style="background-image:  url('<?php echo asset('images/10.jpeg') ; ?>');">
+    <div class="relative w-[768px] max-w-full min-h-[500px] rounded-2xl shadow-2xl overflow-hidden bg-white" id="container">
+        <!-- Login Form Container -->
+        <div id="loginContainer" class="login-container flex flex-col items-center justify-center px-12 h-full text-center">
+            <form id="loginForm" method="post" href="<?= gotolink('login'); ?>" class="w-full max-w-sm mx-auto"  dir="rtl">
+                <input type="hidden" name="form_type" value="login">
+                <h1 class="font-bold text-4xl text-shadow mb-4">تسجيل الدخول</h1>
+                <div class="w-full relative mb-4">
+                    <input type="email" name="loginEmail" placeholder="example@pnu.edu.sa" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                    <small class="text-red-500 text-xs absolute top-full left-0"></small>
                 </div>
-                <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="end_location">الموقع النهائي</label>
-                    <input type="text" id="end_location" name="end_location" value="<?= htmlspecialchars($routeData['end_location']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+                <div class="w-full relative mb-4">
+                    <input type="password" name="loginPassword" placeholder="كلمة المرور" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                    <small class="text-red-500 text-xs absolute top-full left-0"></small>
                 </div>
-                <div class="md:col-span-2">
-                    <label class="block text-teal-700 font-semibold mb-1" for="description">الوصف</label>
-                    <textarea id="description" name="description" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600"><?= htmlspecialchars($routeData['description']); ?></textarea>
+                <div class="w-full relative mb-4">
+                    <label class="block text-right mb-2">تسجيل الدخول ك:</label>
+                    <div class="flex items-center">
+                        <input type="radio" id="student" name="userType" value="student" class="ml-2" checked>
+                        <label for="student" class="ml-4">طالب</label>
+                        <input type="radio" id="admin" name="userType" value="admin" class="ml-2">
+                        <label for="admin">مدير</label>
+                    </div>
                 </div>
-            </div>
-            <div class="flex justify-end mt-4">
-                <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded">
-                    <?= ($viewAction === 'create') ? 'إنشاء الطريق' : 'تعديل الطريق'; ?>
+                <div class="flex items-center justify-between w-full my-4 text-sm">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="checkbox" class="w-4 h-4 accent-[#006c67]" />
+                        <label for="checkbox" class="mr-1 select-none">تذكرني</label>
+                    </div>
+                    <div>
+                        <span id="forgotPasswordLink" class="text-[#006c67] hover:text-[#2691d9] transition duration-300 cursor-pointer">هل نسيت كلمة المرور؟</span>
+                    </div>
+                </div>
+                <button type="submit" class="relative rounded-full border border-[#006c67] bg-[#006c67] text-white font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out hover:tracking-wider active:scale-95 focus:outline-none">
+                    تسجيل الدخول
+                </button>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <form id="forgotPasswordForm" method="post" action="" class="w-full max-w-sm mx-auto hidden">
+                <input type="hidden" name="form_type" value="forgot_password">
+                <h1 class="font-bold text-4xl text-shadow mb-4">إعادة تعيين كلمة المرور</h1>
+                <div class="w-full relative mb-4">
+                    <input type="email" name="resetEmail" placeholder="أدخل بريدك الإلكتروني" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                    <small class="text-red-500 text-xs absolute top-full left-0"></small>
+                </div>
+                <button type="submit" class="relative rounded-full border border-[#006c67] bg-[#006c67] text-white font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out hover:tracking-wider active:scale-95 focus:outline-none">
+                    إرسال رابط إعادة التعيين
+                </button>
+                <div class="mt-4">
+                    <span id="backToLogin" class="text-[#006c67] hover:text-[#2691d9] transition duration-300 cursor-pointer">العودة إلى تسجيل الدخول</span>
+                </div>
+            </form>
+        </div>
+
+        <!-- Register Form Container -->
+        <div id="registerContainer" class="register-container flex flex-col items-center justify-center px-12 h-full text-center" dir="rtl">
+            <form id="registerForm" method="post" href="<?= gotolink(name: 'register'); ?>" class="w-full max-w-sm mx-auto" dir="rtl">
+                <input type="hidden" name="form_type" value="register">
+                <h1 class="font-bold text-4xl text-shadow mb-4">التسجيل هنا</h1>
+                <div class="w-full relative mb-4">
+                    <input type="text" name="username" placeholder="الاسم" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                    <small class="text-red-500 text-xs absolute top-full left-0"></small>
+                </div>
+                <div class="w-full relative mb-4">
+                    <input type="phone" name="studentId" placeholder="رقم الهاتف" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                    <small class="text-red-500 text-xs absolute top-full left-0"></small>
+                </div>
+                <div class="w-full relative mb-4">
+                    <input type="email" name="email" placeholder="example@pnu.edu.sa" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                    <small class="text-red-500 text-xs absolute top-full left-0"></small>
+                </div>
+                <div class="w-full relative mb-4">
+                    <input type="password" name="password" placeholder="كلمة المرور" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                    <small class="text-red-500 text-xs absolute top-full left-0"></small>
+                </div>
+                <div class="w-full mb-4 flex flex-col md:flex-row gap-4">
+                    <div class="w-full relative">
+                        <input type="text" name="district" placeholder="الحي" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                        <small class="text-red-500 text-xs"></small>
+                    </div>
+                    <div class="w-full relative">
+                        <input type="text" name="direction" placeholder="الشارع" class="w-full bg-white text-black outline-none border-b-2 border-gray-300 py-3 focus:border-[#006c67] transition duration-300" />
+                        <small class="text-red-500 text-xs"></small>
+                    </div>
+                </div>
+                <button type="submit" class="relative rounded-full border border-[#006c67] bg-[#006c67] text-white font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out hover:tracking-wider active:scale-95 focus:outline-none">
+                    تسجيل
+                </button>
+            </form>
+        </div> 
+        <!-- Overlay Container -->
+        <div class="absolute top-0 left-1/2 w-1/2 h-full overflow-hidden transition-transform duration-600 ease-in-out overlay-container">
+            <div class="relative left-[-100%] w-[200%] h-full transition-transform duration-600 ease-in-out overlay" style="background-image: url('IMG_7038.jpeg'); background-repeat: no-repeat; background-size: cover; background-position: 0 0;">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#2e5e6d]/40 via-transparent"></div>
+            <div class="absolute top-0 left-0 w-1/2 h-full flex flex-col items-center justify-center px-10 text-center transition-transform duration-600 ease-in-out overlay-panel overlay-left transform -translate-x-[20%]">
+                <h1 class="font-bold text-4xl text-shadow mb-4">مرحبًا</h1>
+                <p class="text-md text-shadow mb-4">مرحبًا بعودتك! هل أنت جاهز لتجربة تنقل جامعي أكثر سلاسة؟<br /><br />دع Masary يسهل رحلتك!</p>
+                <button class="ghost relative rounded-full border-2 border-teal-500 bg-[rgba(255,255,255,0.2)] text-teal-500 font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out focus:outline-none" id="loginToggle">
+                تسجيل الدخول
                 </button>
             </div>
-        </form>
+            <div class="absolute top-0 right-0 w-1/2 h-full flex flex-col items-center justify-center px-10 text-center transition-transform duration-600 ease-in-out overlay-panel overlay-right transform translate-x-0">
+                <h1 class="font-bold text-4xl text-shadow mb-4">ابدأ رحلتك الآن</h1>
+                <p class="text-md text-shadow mb-4">انضم إلى Masary واجعل تنقلك الجامعي أسهل وأسرع!</p>
+                <button class="ghost relative rounded-full border-2 border-teal-500 bg-[rgba(255,255,255,0.2)] text-teal-500 font-bold py-3 px-16 tracking-wide capitalize transition duration-300 ease-in-out focus:outline-none" id="registerToggle">
+                تسجيل
+                </button>
+            </div>
+            </div>
+        </div>
     </div>
-<?php endif; ?>
 
-<?php
-$content = ob_get_clean();
-user_layout($content, ['title' => $title, 'active' => $active]);
-?>
+    <script>
+        const container = document.getElementById("container");
+        const loginToggle = document.getElementById("loginToggle");
+        const registerToggle = document.getElementById("registerToggle");
+        const loginForm = document.getElementById("loginForm");
+        const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+        const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+        const backToLogin = document.getElementById("backToLogin");
+
+        function showLogin() {
+            container.classList.remove("right-panel-active");
+            loginForm.classList.remove("hidden");
+            forgotPasswordForm.classList.add("hidden");
+        }
+
+        function showRegister() {
+            container.classList.add("right-panel-active");
+        }
+
+        registerToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            showRegister();
+        });
+
+        loginToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+
+        forgotPasswordLink.addEventListener("click", () => {
+            loginForm.classList.add("hidden");
+            forgotPasswordForm.classList.remove("hidden");
+        });
+
+        backToLogin.addEventListener("click", () => {
+            forgotPasswordForm.classList.add("hidden");
+            loginForm.classList.remove("hidden");
+        });
+
+        window.onload = () => {
+            showLogin();
+        };
+    </script>
+</body>
+
+</html>

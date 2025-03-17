@@ -31,7 +31,7 @@ use App\Controllers\StudentController;
 $routes = [
     // Public routes
     'home'     => function () {
-        page('admin/admins'); // Adjust as needed
+        page('home'); // Adjust as needed
     },
     'login'    => function () {
         $controller = new AuthController();
@@ -123,6 +123,42 @@ $routes = [
         $controller = new AdminController();
         $controller->deleteBooking($id);
     }),
+    'student.dashboard'    => function() {
+        $controller = new StudentController();
+        $controller->dashboard();
+    },
+    'student.trips'        => function() {
+        $controller = new StudentController();
+        $controller->trips();
+    },
+    'student.book_trip'    => function() {
+        $controller = new StudentController();
+        $controller->bookTrip();
+    },
+    'student.booked_trips' => function() {
+        $controller = new StudentController();
+        $controller->bookedTrips();
+    },
+    'student.reports'      => function() {
+        $controller = new StudentController();
+        $controller->reports();
+    },
+    'student.profile'      => function() {
+        $controller = new StudentController();
+        $controller->profile();
+    },
+    'student.edit_profile' => function() {
+        $controller = new StudentController();
+        $controller->editProfile();
+    },
+    'student.settings'     => function() {
+        $controller = new StudentController();
+        $controller->settings();
+    },
+    'student.delete_account' => function() {
+        $controller = new StudentController();
+        $controller->deleteAccount();
+    }
 ];
 
 $route = isset($_GET['goto']) ? $_GET['goto'] : 'home';
