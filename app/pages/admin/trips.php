@@ -1,5 +1,7 @@
 <?php
 use App\Tables\Trip;
+use App\Tables\Bus;
+use App\Tables\Route; // Make sure this model exists and has start_location and end_location properties.
 
 $active = 'admin.trips';
 $title = 'إدارة الرحلات - لوحة الإدارة';
@@ -16,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'status'       => trim($_POST['status'] ?? '')
     ];
     
+    // Validate all fields except is_full (which is a checkbox)
     foreach ($data as $key => $value) {
         if ($key !== 'is_full' && $value === '') {
             $_SESSION['error'] = "جميع الحقول مطلوبة.";
@@ -26,28 +29,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($action === 'create') {
         $trip = new Trip($data);
-        if ($trip->save()) {
-            $_SESSION['success'] = "تم إنشاء الرحلة بنجاح";
-        } else {
-            $_SESSION['error'] = "فشل إنشاء الرحلة";
-        }
+        $_SESSION['success'] = $trip->save() ? "تم إنشاء الرحلة بنجاح" : "فشل إنشاء الرحلة";
     } elseif ($action === 'edit') {
         $id = $_POST['id'] ?? null;
         if ($id) {
             $trip = Trip::find($id);
             if ($trip) {
-                $trip->trip_date = $data['trip_date'];
-                $trip->trip_time = $data['trip_time'];
-                $trip->is_full = $data['is_full'];
+                $trip->trip_date    = $data['trip_date'];
+                $trip->trip_time    = $data['trip_time'];
+                $trip->is_full      = $data['is_full'];
                 $trip->max_students = $data['max_students'];
-                $trip->bus_id = $data['bus_id'];
-                $trip->route_id = $data['route_id'];
-                $trip->status = $data['status'];
-                if ($trip->save()) {
-                    $_SESSION['success'] = "تم تعديل بيانات الرحلة بنجاح";
-                } else {
-                    $_SESSION['error'] = "فشل تعديل بيانات الرحلة";
-                }
+                $trip->bus_id       = $data['bus_id'];
+                $trip->route_id     = $data['route_id'];
+                $trip->status       = $data['status'];
+                $_SESSION['success'] = $trip->save() ? "تم تعديل بيانات الرحلة بنجاح" : "فشل تعديل بيانات الرحلة";
             } else {
                 $_SESSION['error'] = "الرحلة غير موجودة";
             }
@@ -67,6 +62,10 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
         exit;
     }
 }
+
+// Retrieve lists for select fields
+$buses = Bus::all();
+$routes = Route::all();
 ?>
 
 <div class="mb-6 flex justify-between items-center">
@@ -93,8 +92,8 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الوقت</th>
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الحالة</th>
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الحد الأقصى</th>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">رقم الحافلة</th>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">معرف الطريق</th>
+                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الحافلة</th>
+                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الطريق</th>
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الإجراءات</th>
                 </tr>
             </thead>
@@ -107,8 +106,18 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($trip->trip_time); ?></td>
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($trip->status); ?></td>
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($trip->max_students); ?></td>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($trip->bus_id); ?></td>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($trip->route_id); ?></td>
+                            <td class="px-4 py-2 text-right">
+                                <?php 
+                                    $bus = $trip->getBus();
+                                    echo htmlspecialchars($bus->bus_number . " (" . ($bus->getDriver()->name ?? 'بدون سائق') . ")");
+                                ?>
+                            </td>
+                            <td class="px-4 py-2 text-right">
+                                <?php 
+                                    $route = $trip->getRoute();
+                                    echo htmlspecialchars($route->start_location . " - " . $route->end_location);
+                                ?>
+                            </td>
                             <td class="px-4 py-2 text-right">
                                 <a href="<?= gotolink('admin.trips', ['action' => 'edit', 'id' => $trip->id]); ?>" class="text-blue-600 hover:underline mr-2">
                                     <i class="fas fa-edit"></i> تعديل
@@ -130,14 +139,14 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
 <?php elseif ($viewAction === 'create' || $viewAction === 'edit'):
     $formTitle = ($viewAction === 'create') ? "إضافة رحلة جديدة" : "تعديل بيانات الرحلة";
     $tripData = [
-        'id'          => $viewAction === 'edit' ? $editTrip->id : '',
-        'trip_date'   => $viewAction === 'edit' ? $editTrip->trip_date : '',
-        'trip_time'   => $viewAction === 'edit' ? $editTrip->trip_time : '',
-        'is_full'     => $viewAction === 'edit' ? $editTrip->is_full : 0,
-        'max_students'=> $viewAction === 'edit' ? $editTrip->max_students : '',
-        'bus_id'      => $viewAction === 'edit' ? $editTrip->bus_id : '',
-        'route_id'    => $viewAction === 'edit' ? $editTrip->route_id : '',
-        'status'      => $viewAction === 'edit' ? $editTrip->status : ''
+        'id'           => $viewAction === 'edit' ? $editTrip->id : '',
+        'trip_date'    => $viewAction === 'edit' ? $editTrip->trip_date : '',
+        'trip_time'    => $viewAction === 'edit' ? $editTrip->trip_time : '',
+        'is_full'      => $viewAction === 'edit' ? $editTrip->is_full : 0,
+        'max_students' => $viewAction === 'edit' ? $editTrip->max_students : '',
+        'bus_id'       => $viewAction === 'edit' ? $editTrip->bus_id : '',
+        'route_id'     => $viewAction === 'edit' ? $editTrip->route_id : '',
+        'status'       => $viewAction === 'edit' ? $editTrip->status : ''
     ];
 ?>
     <div class="bg-white p-6 rounded-lg shadow max-w-3xl mx-auto">
@@ -150,32 +159,46 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Trip Date -->
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="trip_date">تاريخ الرحلة</label>
+                    <label for="trip_date" class="block text-teal-700 font-semibold mb-1">تاريخ الرحلة</label>
                     <input type="date" id="trip_date" name="trip_date" value="<?= htmlspecialchars($tripData['trip_date']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
                 </div>
                 <!-- Trip Time -->
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="trip_time">وقت الرحلة</label>
+                    <label for="trip_time" class="block text-teal-700 font-semibold mb-1">وقت الرحلة</label>
                     <input type="time" id="trip_time" name="trip_time" value="<?= htmlspecialchars($tripData['trip_time']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
                 </div>
                 <!-- Max Students -->
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="max_students">الحد الأقصى للطلاب</label>
+                    <label for="max_students" class="block text-teal-700 font-semibold mb-1">الحد الأقصى للطلاب</label>
                     <input type="number" id="max_students" name="max_students" value="<?= htmlspecialchars($tripData['max_students']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
                 </div>
-                <!-- Bus ID -->
+                <!-- Bus Select -->
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="bus_id">رقم الحافلة</label>
-                    <input type="number" id="bus_id" name="bus_id" value="<?= htmlspecialchars($tripData['bus_id']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+                    <label for="bus_id" class="block text-teal-700 font-semibold mb-1">الحافلة</label>
+                    <select id="bus_id" name="bus_id" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+                        <option value="">اختر الحافلة</option>
+                        <?php foreach ($buses as $bus): ?>
+                            <option value="<?= htmlspecialchars($bus->id); ?>" <?= ($tripData['bus_id'] == $bus->id) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($bus->bus_number); ?> (<?= htmlspecialchars($bus->getDriver()->name ?? 'بدون سائق'); ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-                <!-- Route ID -->
+                <!-- Route Select -->
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="route_id">معرف الطريق</label>
-                    <input type="number" id="route_id" name="route_id" value="<?= htmlspecialchars($tripData['route_id']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+                    <label for="route_id" class="block text-teal-700 font-semibold mb-1">الطريق</label>
+                    <select id="route_id" name="route_id" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+                        <option value="">اختر الطريق</option>
+                        <?php foreach ($routes as $route): ?>
+                            <option value="<?= htmlspecialchars($route->id); ?>" <?= ($tripData['route_id'] == $route->id) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($route->start_location); ?> - <?= htmlspecialchars($route->end_location); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <!-- Status -->
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="status">الحالة</label>
+                    <label for="status" class="block text-teal-700 font-semibold mb-1">الحالة</label>
                     <select id="status" name="status" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
                         <option value="">اختر الحالة</option>
                         <option value="مجدول" <?= ($tripData['status'] === 'مجدول') ? 'selected' : ''; ?>>مجدول</option>

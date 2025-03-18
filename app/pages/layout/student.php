@@ -47,21 +47,36 @@ $isAuth = isset($_SESSION['student_id']); // adjust as needed
     <nav class="bg-teal-700 text-white shadow fixed w-full z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <a href="#hero" class="text-2xl font-bold flex items-center">
-                <i class="fas fa-bus-alt mr-2"></i> مسرى
+                <i class="fas fa-bus-alt m-2 "></i> مساري
             </a>
             <div class="hidden md:flex space-x-6">
                 <?php if ($isAuth): ?>
-                    <a href="<?= gotolink('student.dashboard'); ?>" class="block px-4 py-2 hover:bg-teal-800">الرئيسية</a>
-                    <a href="<?= gotolink('student.trips'); ?>" class="block px-4 py-2 hover:bg-teal-800">رحلاتي</a>
-                    <a href="<?= gotolink('student.booked_trips'); ?>" class="block px-4 py-2 hover:bg-teal-800">بلاغاتي</a>
+                    <a href="<?= gotolink('student.home'); ?>"
+                        class="mx-3 <?= ($active == 'student.home') ? 'text-teal-300' : 'hover:text-teal-300' ?>">
+                        الرئيسية
+                    </a>
 
+                    <a href="<?= gotolink('student.trips'); ?>"
+                        class="mx-3 <?= ($active == 'student.trips') ? 'text-teal-300' : 'hover:text-teal-300' ?>">
+                        مواعيد الحفلات
+                    </a>
+
+                    <a href="<?= gotolink('student.trips'); ?>"
+                        class="mx-3 <?= ($active == 'student.booking') ? 'text-teal-300' : 'hover:text-teal-300' ?>">
+                        حجز
+                    </a>
+
+                    <a href="<?= gotolink('student.booked_trips'); ?>"
+                        class="mx-3 <?= ($active == 'student.booked_trips') ? 'text-teal-300' : 'hover:text-teal-300' ?>">
+                        رحلاتي
+                    </a>
                 <?php else: ?>
 
                     <a href="#hero" class="hover:text-teal-300 mx-3">الرئيسية</a>
                     <a href="#services" class="hover:text-teal-300">خدماتنا</a>
                     <a href="#how-it-works" class="hover:text-teal-300">كيف نعمل</a>
                     <a href="#featured-trips" class="hover:text-teal-300">رحلات مميزة</a>
-                    <a href="#advantages" class="hover:text-teal-300">لماذا تختار مسرى؟</a>
+                    <a href="#advantages" class="hover:text-teal-300">لماذا تختار مساري؟</a>
                     <a href="#faq" class="hover:text-teal-300">الأسئلة الشائعة</a>
                     <a href="#contact" class="hover:text-teal-300">تواصل معنا</a>
                 <?php endif; ?>
@@ -78,14 +93,13 @@ $isAuth = isset($_SESSION['student_id']); // adjust as needed
                             <span class="mx-1"><?= auth()->student()->fullName ?? 'حسابي'; ?></span>
                             <i class="fas fa-chevron-down ml-1"></i>
                         </button>
-                        <div id="userMenuDropdown" class="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded shadow-lg hidden z-50">
-                            <a href="<?= gotolink('student.profile'); ?>" class="flex items-center px-4 py-2 hover:bg-green-100">
+                        <div id="userMenuDropdown" class="absolute right-[-80px] lgright-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 p-2">
+                            <a href="<?= gotolink('student.profile'); ?>" class="flex items-center px-4 py-2 hover:bg-green-100 ">
                                 <i class="fas fa-user text-blue-500 ml-2"></i> ملفي
                             </a>
                             <a href="<?= gotolink('student.edit_profile'); ?>" class="flex items-center px-4 py-2 hover:bg-green-100">
                                 <i class="fas fa-edit text-purple-500 ml-2"></i> تعديل الملف
                             </a>
-                           
                             <a href="<?= gotolink('student.delete_account'); ?>" class="flex items-center px-4 py-2 hover:bg-green-100">
                                 <i class="fas fa-trash-alt text-red-500 ml-2"></i> حذف الحساب
                             </a>
@@ -108,16 +122,33 @@ $isAuth = isset($_SESSION['student_id']); // adjust as needed
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-teal-700">
             <?php if ($isAuth): ?>
-                <a href="<?= gotolink('student.dashboard'); ?>" class="block px-4 py-2 hover:bg-teal-800">الرئيسية</a>
-                <a href="<?= gotolink('student.trips'); ?>" class="block px-4 py-2 hover:bg-teal-800">رحلاتي</a>
-                <a href="<?= gotolink('student.booked_trips'); ?>" class="block px-4 py-2 hover:bg-teal-800">بلاغاتي</a>
+
+                <nav class="flex flex-col gap-6 p-4">
+                    <a href="<?= gotolink('student.home'); ?>"
+                       class="block px-4 py-2 rounded transition-colors duration-200 <?= ($active == 'student.home') ? 'bg-teal-600 text-white' : 'text-gray-700 hover:bg-teal-50 hover:text-teal-600' ?>">
+                        الرئيسية
+                    </a>
+                    <a href="<?= gotolink('student.trips'); ?>"
+                       class="block px-4 py-2 rounded transition-colors duration-200 <?= ($active == 'student.trips') ? 'bg-teal-600 text-white' : 'text-gray-700 hover:bg-teal-50 hover:text-teal-600' ?>">
+                        مواعيد الحفلات
+                    </a>
+                    <a href="<?= gotolink('student.trips'); ?>"
+                       class="block px-4 py-2 rounded transition-colors duration-200 <?= ($active == 'student.booking') ? 'bg-teal-600 text-white' : 'text-gray-700 hover:bg-teal-50 hover:text-teal-600' ?>">
+                        حجز
+                    </a>
+                    <a href="<?= gotolink('student.booked_trips'); ?>"
+                       class="block px-4 py-2 rounded transition-colors duration-200 <?= ($active == 'student.booked_trips') ? 'bg-teal-600 text-white' : 'text-gray-700 hover:bg-teal-50 hover:text-teal-600' ?>">
+                        رحلاتي
+                    </a>
+                </nav>
+
 
             <?php else: ?>
                 <a href="#hero" class="block px-4 py-2 hover:bg-teal-800">الرئيسية</a>
                 <a href="#services" class="block px-4 py-2 hover:bg-teal-800">خدماتنا</a>
                 <a href="#how-it-works" class="block px-4 py-2 hover:bg-teal-800">كيف نعمل</a>
                 <a href="#featured-trips" class="block px-4 py-2 hover:bg-teal-800">رحلات مميزة</a>
-                <a href="#advantages" class="block px-4 py-2 hover:bg-teal-800">لماذا تختار مسرى؟</a>
+                <a href="#advantages" class="block px-4 py-2 hover:bg-teal-800">لماذا تختار مساري؟</a>
                 <a href="#faq" class="block px-4 py-2 hover:bg-teal-800">الأسئلة الشائعة</a>
                 <a href="#contact" class="block px-4 py-2 hover:bg-teal-800">تواصل معنا</a>
                 <a href="login.html" class="block px-4 py-2 hover:bg-teal-800">تسجيل الدخول</a>
@@ -141,7 +172,7 @@ $isAuth = isset($_SESSION['student_id']); // adjust as needed
     <!-- Footer -->
     <footer class="bg-teal-800 text-white">
         <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
-            <p class="text-center">&copy; <?= date('Y'); ?> مسرى. جميع الحقوق محفوظة.</p>
+            <p class="text-center">&copy; <?= date('Y'); ?> مساري. جميع الحقوق محفوظة.</p>
             <div class="flex space-x-4 mt-2 md:mt-0">
                 <a href="#" class="hover:text-teal-300"><i class="fab fa-facebook-f text-xl"></i></a>
                 <a href="#" class="hover:text-teal-300"><i class="fab fa-twitter text-xl"></i></a>
@@ -149,29 +180,68 @@ $isAuth = isset($_SESSION['student_id']); // adjust as needed
             </div>
         </div>
     </footer>
+    <?php if (isset($_SESSION['success']) || isset($_SESSION['error'])): ?>
+        <div id="alert-container" class="fixed top-5 left-0 z-50 m-5 p-4">
+            <?php if (isset($_SESSION['success'])): ?>
+                <div id="success-alert" class="flex items-center p-4 mb-4 text-green-800 border border-green-400 rounded-lg bg-green-50 shadow-lg transition-opacity duration-500 ease-in-out">
+                    <i class="fas fa-check-circle text-xl mx-2"></i>
+                    <span class="mx-4"><?= $_SESSION['success']; ?></span>
+                    <button onclick="closeAlert('success-alert')" class="mx-2 text-lg text-green-800 hover:text-green-900">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['error'])): ?>
+                <div id="error-alert" class="flex items-center p-4 mb-4 text-red-800 border border-red-400 rounded-lg bg-red-50 shadow-lg transition-opacity duration-500 ease-in-out"></div>
+                <i class="fas fa-exclamation-circle text-xl mx-2"></i>
+                <span class="mx-4"><?= $_SESSION['error']; ?></span>
+                <button onclick="closeAlert('error-alert')" class="mx-2 text-lg text-red-800 hover:text-red-900">
+                    <i class="fas fa-times"></i>
+                </button>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+    </div>
+<?php endif; ?>
 
-    <script>
-        // Toggle mobile menu
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+<script>
+    // Close alert manually
+    function closeAlert(id) {
+        document.getElementById(id).classList.add("opacity-0");
+        setTimeout(() => document.getElementById(id).remove(), 500);
+    }
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(() => {
+        document.querySelectorAll("#alert-container div").forEach((alert) => {
+            alert.classList.add("opacity-0");
+            setTimeout(() => alert.remove(), 500);
         });
-         // User menu dropdown toggle
+    }, 5000);
+</script>
+<script>
+    // Toggle mobile menu
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+    // User menu dropdown toggle
     const userMenuButton = document.getElementById('userMenuButton');
     const userMenuDropdown = document.getElementById('userMenuDropdown');
     userMenuButton && userMenuButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      userMenuDropdown.classList.toggle('hidden');
+        e.stopPropagation();
+        userMenuDropdown.classList.toggle('hidden');
     });
 
     // Hide dropdown when clicking outside
     document.addEventListener('click', (e) => {
-      if (!userMenuDropdown.classList.contains('hidden')) {
-        userMenuDropdown.classList.add('hidden');
-      }
+        if (!userMenuDropdown.classList.contains('hidden')) {
+            userMenuDropdown.classList.add('hidden');
+        }
     });
-    </script>
+</script>
 </body>
 
 </html>

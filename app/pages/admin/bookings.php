@@ -10,9 +10,9 @@ $title = 'إدارة الحجوزات - لوحة الإدارة';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['form_action'] ?? '';
     $data = [
-        'student_id'   => trim($_POST['student_id'] ?? ''),
-        'trip_id'      => trim($_POST['trip_id'] ?? ''),
-        'booking_date' => trim($_POST['booking_date'] ?? ''),
+        'student_id'     => trim($_POST['student_id'] ?? ''),
+        'trip_id'        => trim($_POST['trip_id'] ?? ''),
+        'booking_date'   => trim($_POST['booking_date'] ?? ''),
         'booking_status' => trim($_POST['booking_status'] ?? '')
     ];
     foreach ($data as $key => $value) {
@@ -91,7 +91,7 @@ $trips = Trip::all();
             <tbody class="divide-y divide-gray-200">
                 <?php if (!empty($bookings)): ?>
                     <?php foreach ($bookings as $booking): ?>
-                        <tr>
+                        <tr class="hover:bg-teal-50 transition-colors">
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($booking->id); ?></td>
                             <td class="px-4 py-2 text-right">
                                 <?php
@@ -106,7 +106,24 @@ $trips = Trip::all();
                                 ?>
                             </td>
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($booking->booking_date); ?></td>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($booking->booking_status); ?></td>
+                            <td class="px-4 py-2 text-right">
+                                <?php 
+                                    $status = $booking->booking_status;
+                                    // Set badge class based on Arabic status
+                                    if ($status === 'قيد الانتظار') {
+                                        $badgeClass = 'bg-yellow-500';
+                                    } elseif ($status === 'مؤكد') {
+                                        $badgeClass = 'bg-green-500';
+                                    } elseif ($status === 'ملغى') {
+                                        $badgeClass = 'bg-red-500';
+                                    } else {
+                                        $badgeClass = 'bg-gray-500';
+                                    }
+                                ?>
+                                <span class="inline-block px-3 py-1 rounded-full text-white text-sm <?= $badgeClass; ?>">
+                                    <?= htmlspecialchars($status); ?>
+                                </span>
+                            </td>
                             <td class="px-4 py-2 text-right">
                                 <a href="<?= gotolink('admin.bookings', ['action' => 'edit', 'id' => $booking->id]); ?>" class="text-blue-600 hover:underline mr-2">
                                     <i class="fas fa-edit"></i> تعديل
@@ -128,11 +145,11 @@ $trips = Trip::all();
 <?php elseif ($viewAction === 'create' || $viewAction === 'edit'):
     $formTitle = ($viewAction === 'create') ? "إضافة حجز جديد" : "تعديل بيانات الحجز";
     $bookingData = [
-        'id'            => $viewAction === 'edit' ? $editBooking->id : '',
-        'student_id'    => $viewAction === 'edit' ? $editBooking->student_id : '',
-        'trip_id'       => $viewAction === 'edit' ? $editBooking->trip_id : '',
-        'booking_date'  => $viewAction === 'edit' ? $editBooking->booking_date : '',
-        'booking_status'=> $viewAction === 'edit' ? $editBooking->booking_status : ''
+        'id'             => $viewAction === 'edit' ? $editBooking->id : '',
+        'student_id'     => $viewAction === 'edit' ? $editBooking->student_id : '',
+        'trip_id'        => $viewAction === 'edit' ? $editBooking->trip_id : '',
+        'booking_date'   => $viewAction === 'edit' ? $editBooking->booking_date : '',
+        'booking_status' => $viewAction === 'edit' ? $editBooking->booking_status : ''
     ];
 ?>
     <div class="bg-white p-6 rounded-lg shadow max-w-3xl mx-auto">

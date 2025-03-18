@@ -1,16 +1,17 @@
 <?php
 use App\Tables\Bus;
-
+use App\Tables\Driver; // Make sure this exists and returns all drivers.
 $active = 'admin.buses';
 $title = 'إدارة الحافلات - لوحة الإدارة';
 
+// Process form submission for create/edit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['form_action'] ?? '';
     $data = [
-        'bus_number'   => trim($_POST['bus_number'] ?? ''),
-        'capacity'     => trim($_POST['capacity'] ?? ''),
-        'license_plate'=> trim($_POST['license_plate'] ?? ''),
-        'driver_id'    => trim($_POST['driver_id'] ?? '')
+        'bus_number'    => trim($_POST['bus_number'] ?? ''),
+        'capacity'      => trim($_POST['capacity'] ?? ''),
+        'license_plate' => trim($_POST['license_plate'] ?? ''),
+        'driver_id'     => trim($_POST['driver_id'] ?? '')
     ];
     foreach ($data as $key => $value) {
         if ($value === '') {
@@ -28,10 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id) {
             $bus = Bus::find($id);
             if ($bus) {
-                $bus->bus_number = $data['bus_number'];
-                $bus->capacity = $data['capacity'];
+                $bus->bus_number    = $data['bus_number'];
+                $bus->capacity      = $data['capacity'];
                 $bus->license_plate = $data['license_plate'];
-                $bus->driver_id = $data['driver_id'];
+                $bus->driver_id     = $data['driver_id'];
                 $_SESSION['success'] = $bus->save() ? "تم تعديل بيانات الحافلة بنجاح" : "فشل تعديل بيانات الحافلة";
             } else {
                 $_SESSION['error'] = "الحافلة غير موجودة";
@@ -52,6 +53,9 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
         exit;
     }
 }
+
+// Retrieve drivers list for the select dropdown in the form.
+$drivers = Driver::all();
 ?>
 
 <div class="mb-6 flex justify-between items-center">
@@ -77,7 +81,7 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">رقم الحافلة</th>
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">السعة</th>
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">لوحة الترخيص</th>
-                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">معرف السائق</th>
+                    <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">السائق</th>
                     <th class="px-4 py-2 text-right text-sm font-bold text-teal-700">الإجراءات</th>
                 </tr>
             </thead>
@@ -89,7 +93,12 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($bus->bus_number); ?></td>
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($bus->capacity); ?></td>
                             <td class="px-4 py-2 text-right"><?= htmlspecialchars($bus->license_plate); ?></td>
-                            <td class="px-4 py-2 text-right"><?= htmlspecialchars($bus->driver_id); ?></td>
+                            <td class="px-4 py-2 text-right">
+                                <?php 
+                                    $driver = $bus->getDriver(); // This should return the driver object.
+                                    echo htmlspecialchars($driver->name ?? 'غير محدد'); 
+                                ?>
+                            </td>
                             <td class="px-4 py-2 text-right">
                                 <a href="<?= gotolink('admin.buses', ['action' => 'edit', 'id' => $bus->id]); ?>" class="text-blue-600 hover:underline mr-2">
                                     <i class="fas fa-edit"></i> تعديل
@@ -111,11 +120,11 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
 <?php elseif ($viewAction === 'create' || $viewAction === 'edit'):
     $formTitle = ($viewAction === 'create') ? "إضافة حافلة جديدة" : "تعديل بيانات الحافلة";
     $busData = [
-        'id'           => $viewAction === 'edit' ? $editBus->id : '',
-        'bus_number'   => $viewAction === 'edit' ? $editBus->bus_number : '',
-        'capacity'     => $viewAction === 'edit' ? $editBus->capacity : '',
-        'license_plate'=> $viewAction === 'edit' ? $editBus->license_plate : '',
-        'driver_id'    => $viewAction === 'edit' ? $editBus->driver_id : ''
+        'id'            => $viewAction === 'edit' ? $editBus->id : '',
+        'bus_number'    => $viewAction === 'edit' ? $editBus->bus_number : '',
+        'capacity'      => $viewAction === 'edit' ? $editBus->capacity : '',
+        'license_plate' => $viewAction === 'edit' ? $editBus->license_plate : '',
+        'driver_id'     => $viewAction === 'edit' ? $editBus->driver_id : ''
     ];
 ?>
     <div class="bg-white p-6 rounded-lg shadow max-w-3xl mx-auto">
@@ -127,20 +136,27 @@ if ($viewAction === 'edit' && isset($_GET['id'])) {
             <input type="hidden" name="form_action" value="<?= $viewAction; ?>">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="bus_number">رقم الحافلة</label>
+                    <label for="bus_number" class="block text-teal-700 font-semibold mb-1">رقم الحافلة</label>
                     <input type="text" id="bus_number" name="bus_number" value="<?= htmlspecialchars($busData['bus_number']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
                 </div>
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="capacity">السعة</label>
+                    <label for="capacity" class="block text-teal-700 font-semibold mb-1">السعة</label>
                     <input type="number" id="capacity" name="capacity" value="<?= htmlspecialchars($busData['capacity']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
                 </div>
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="license_plate">لوحة الترخيص</label>
+                    <label for="license_plate" class="block text-teal-700 font-semibold mb-1">لوحة الترخيص</label>
                     <input type="text" id="license_plate" name="license_plate" value="<?= htmlspecialchars($busData['license_plate']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
                 </div>
                 <div>
-                    <label class="block text-teal-700 font-semibold mb-1" for="driver_id">معرف السائق</label>
-                    <input type="number" id="driver_id" name="driver_id" value="<?= htmlspecialchars($busData['driver_id']); ?>" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+                    <label for="driver_id" class="block text-teal-700 font-semibold mb-1">السائق</label>
+                    <select id="driver_id" name="driver_id" required class="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-600">
+                        <option value="">اختر السائق</option>
+                        <?php foreach ($drivers as $driver): ?>
+                            <option value="<?= htmlspecialchars($driver->id); ?>" <?= ($busData['driver_id'] == $driver->id) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($driver->name); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
             <div class="flex justify-end mt-4">

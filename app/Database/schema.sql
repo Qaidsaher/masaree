@@ -1,4 +1,7 @@
-- Drop tables in the correct order to prevent foreign key issues
+DROP DATABASE IF EXISTS masaree;
+CREATE DATABASE masaree;
+USE masaree;
+
 DROP TABLE IF EXISTS bookings;
 DROP TABLE IF EXISTS trips;
 DROP TABLE IF EXISTS routes;
@@ -80,11 +83,9 @@ CREATE TABLE bookings (
 
 -- Insert sample data for admins
 INSERT INTO admins (username, password, email) VALUES
-('Masaree1', 'password1', 'admin1@masari.com'),
-('Masaree2', 'password2', 'admin2@masari.com'),
-('Masaree3', 'password3', 'admin3@masari.com'),
-('Masaree4', 'password4', 'admin4@masari.com'),
-('Masaree5', 'password5', 'admin5@masari.com');
+('masary admin ', '$2y$10$IhLTwmKMC0nA9O/fQqRJYOaSkjQEtm8LSFUOSzNCEHJrpHI4iW1tu', 'admin1@gmail.com'),
+('admin', '$2y$10$IhLTwmKMC0nA9O/fQqRJYOaSkjQEtm8LSFUOSzNCEHJrpHI4iW1tu', 'admin2@gmail.com');
+-- note the password of admin is admin123
 
 -- Insert sample data for drivers
 INSERT INTO drivers (name, phone, email) VALUES
@@ -96,11 +97,12 @@ INSERT INTO drivers (name, phone, email) VALUES
 
 -- Insert sample data for students with password, district, and street
 INSERT INTO students (name, email, phone, password, address, district, street) VALUES
-('طالب ١', 'student1@masari.com', '0111111111', 'Student@123', 'القاهرة', 'مدينة نصر', 'شارع عباس العقاد'),
-('طالب ٢', 'student2@masari.com', '0111111112', 'Password@234', 'الجيزة', 'الدقي', 'شارع التحرير'),
-('طالب ٣', 'student3@masari.com', '0111111113', 'Secure#Pass3', 'الإسكندرية', 'سموحة', 'شارع فوزي معاذ'),
-('طالب ٤', 'student4@masari.com', '0111111114', 'Pass!word4', 'طنطا', 'حي الجامعة', 'شارع الجيش'),
-('طالب ٥', 'student5@masari.com', '0111111115', 'Masari@2025', 'أسيوط', 'المعلمين', 'شارع الهلالي');
+('طالب ١', 'student1@gamil.com', '0111111111', '$2y$10$xdTUoezBgGifD2jPSU1hgeH9GWsvAtvUOcEVGPWDxrhU6wY8ZofrC', 'القاهرة', 'مدينة نصر', 'شارع عباس العقاد'),
+('طالب ٢', 'student2@masari.com', '0111111112', SHA2('Password@234',256), 'الرياض', 'السلام', 'شارع الملك فهد'),
+('طالب ３', 'student3@masari.com', '0111111113', SHA2('Secure#Pass3',256), 'جدة', 'البدر', 'شارع التحلية'),
+('طالب ٤', 'student4@masari.com', '0111111114', SHA2('Pass!word4',256), 'الدمام', 'الشعب', 'شارع الأمير محمد بن فهد'),
+('طالب ٥', 'student5@masari.com', '0111111115', SHA2('Masari@2025',256), 'مكة', 'العزيزية', 'شارع طارق بن زياد');
+-- note the student1 password is : student123
 
 -- Insert sample data for buses
 INSERT INTO buses (bus_number, capacity, license_plate, driver_id) VALUES
@@ -112,11 +114,11 @@ INSERT INTO buses (bus_number, capacity, license_plate, driver_id) VALUES
 
 -- Insert sample data for routes
 INSERT INTO routes (start_location, end_location, description) VALUES
-('القاهرة', 'الجيزة', 'طريق سريع من القاهرة إلى الجيزة'),
-('القاهرة', 'الإسكندرية', 'رحلة طويلة من القاهرة إلى الإسكندرية'),
-('الجيزة', 'الإسكندرية', 'طريق مباشر بين الجيزة والإسكندرية'),
-('القاهرة', 'أسوان', 'رحلة من القاهرة إلى أسوان'),
-('القاهرة', 'طنطا', 'طريق محلي من القاهرة إلى طنطا');
+('الرياض', 'جدة', 'طريق سريع من الرياض إلى جدة'),
+('الرياض', 'مكة', 'رحلة طويلة من الرياض إلى مكة'),
+('جدة', 'الدمام', 'طريق مباشر بين جدة والدمام'),
+('الرياض', 'المدينة', 'رحلة من الرياض إلى المدينة'),
+('الرياض', 'الدرعية', 'طريق محلي من الرياض إلى الدرعية');
 
 -- Insert sample data for trips
 INSERT INTO trips (trip_date, trip_time, is_full, max_students, bus_id, route_id, status) VALUES

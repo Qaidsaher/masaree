@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Tables\Trip;
@@ -7,7 +8,8 @@ use App\Tables\Report;
 use App\Tables\RequestPoint;
 use App\Tables\Challenge;
 
-class StudentController {
+class StudentController
+{
 
     /**
      * Show the student dashboard.
@@ -33,33 +35,8 @@ class StudentController {
      */
     public function bookTrip()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Process form submission
-            $tripId = $_POST['trip_id'] ?? null;
-            if (!$tripId) {
-                $_SESSION['error'] = "لم يتم تحديد الرحلة.";
-                header("Location: " . gotolink('student.trips'));
-                exit;
-            }
-            // Prepare booking data
-            $data = [
-                'student_id'   => auth()->student()->id,
-                'trip_id'      => $tripId,
-                'booking_date' => trim($_POST['booking_date'] ?? date('Y-m-d')),
-                // booking_status will be set by default (e.g., "قيد الانتظار") in the model
-            ];
-            $booking = new Booking($data);
-            if ($booking->save()) {
-                $_SESSION['success'] = "تم حجز الرحلة بنجاح";
-            } else {
-                $_SESSION['error'] = "فشل حجز الرحلة";
-            }
-            header("Location: " . gotolink('student.trips'));
-            exit;
-        } else {
-            // GET: Display the booking form
-            page('student/book_trip');
-        }
+
+        page('student/book_trip');
     }
 
     /**
@@ -67,10 +44,11 @@ class StudentController {
      */
     public function bookedTrips()
     {
+        
         page('student/booked_trips');
     }
 
-   
+
 
     /**
      * Show available challenges.
@@ -102,7 +80,7 @@ class StudentController {
                 header("Location: " . gotolink('login'));
                 exit;
             }
-    
+
             // Sanitize and update student data.
             $data = [
                 'name' => trim($_POST['fullName'] ?? ''),
@@ -112,7 +90,7 @@ class StudentController {
                 'district' => trim($_POST['district'] ?? ''),
                 'street'   => trim($_POST['street'] ?? ''),
             ];
-    
+
             // Check required fields.
             foreach ($data as $field => $value) {
                 if ($value === '') {
@@ -121,15 +99,15 @@ class StudentController {
                     exit;
                 }
             }
-    
+
             // Update properties using fill (or set individually).
             $student->fill($data);
-    
+
             // If password is provided, update it.
             if (!empty($_POST['password'])) {
                 $student->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
-    
+
             // Attempt to save changes.
             if ($student->save()) {
                 $_SESSION['success'] = "تم تحديث الملف الشخصي بنجاح";
@@ -143,7 +121,7 @@ class StudentController {
             page('student/edit_profile');
         }
     }
-    
+
     public function deleteAccount()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -167,5 +145,4 @@ class StudentController {
             page('student/delete_account');
         }
     }
-    
 }

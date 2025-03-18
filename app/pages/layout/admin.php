@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= isset($title) ? $title : 'لوحة الإدارة - مسرى'; ?></title>
+  <title><?= isset($title) ? $title : 'لوحة الإدارة - masary'; ?></title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- Tailwind CSS output (ensure your CSS uses white and teal as primary colors) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -65,9 +65,9 @@
     <!-- Desktop Sidebar -->
     <aside class="hidden md:flex md:flex-shrink-0">
       <div class="flex flex-col w-64 bg-teal-700 text-white">
-        <div class="flex items-center justify-center h-16 border-b border-teal-800">
-          <a href="<?= gotolink('admin.home'); ?>" class="text-2xl font-bold flex items-center">
-            <i class="fas fa-bus-alt ml-3"></i> مسرى
+        <div class="flex items-center justify-start h-16 border-b border-teal-800 ">
+          <a href="<?= gotolink('admin.home'); ?>" class="px-2 text-2xl font-bold flex items-center">
+            <i class="fas fa-bus-alt m-3"></i> مساري
           </a>
         </div>
         <nav class="flex-1 overflow-y-auto px-2 py-4 space-y-1">
@@ -118,7 +118,8 @@
       <!-- Mobile Topbar -->
       <header class="md:hidden flex items-center justify-between bg-teal-700 px-4 py-4">
         <a href="<?= gotolink('admin.home'); ?>" class="text-xl font-bold text-white flex items-center">
-          <i class="fas fa-bus-alt ml-2"></i> مسرى
+          <i class="fas fa-bus-alt ml-2"></i>
+          مساري
         </a>
         <button id="mobileSidebarToggle" class="text-white focus:outline-none">
           <i class="fas fa-bars text-2xl"></i>
@@ -126,9 +127,9 @@
       </header>
       <!-- Mobile Sidebar Panel -->
       <div id="mobileSidebar" class="fixed inset-y-0 right-0 w-64 bg-teal-700 text-white transform translate-x-full transition duration-300 ease-in-out md:hidden">
-        <div class="flex items-center justify-center h-16 border-b border-teal-800">
+        <div class="flex items-center justify-start h-16 border-b border-teal-800">
           <a href="<?= gotolink('admin.home'); ?>" class="text-2xl font-bold flex items-center">
-            <i class="fas fa-bus-alt ml-2"></i> مسرى
+            <i class="fas fa-bus-alt ml-2"></i> مساري
           </a>
         </div>
         <nav class="px-2 py-4 space-y-2">
@@ -186,7 +187,7 @@
   <!-- Footer -->
   <footer class="bg-teal-700 text-white">
     <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
-      <p class="flex text-center px-8">&copy; <?= date('Y'); ?> لوحة الإدارة - مسرى. جميع الحقوق محفوظة.</p>
+      <p class="flex text-center px-8">&copy; <?= date('Y'); ?> لوحة الإدارة - مساري. جميع الحقوق محفوظة.</p>
       <div class="space-x-4">
         <a href="#" class="hover:text-teal-200"><i class="fab fa-facebook-f text-xl mx-2"></i></a>
         <a href="#" class="hover:text-teal-200"><i class="fab fa-twitter text-xl mx-2"></i></a>
@@ -195,55 +196,54 @@
     </div>
   </footer>
 
-  <!-- Alert Messages -->
   <?php if (isset($_SESSION['success']) || isset($_SESSION['error'])): ?>
     <div id="alert-container" class="fixed top-5 left-0 z-50 m-5 p-4">
       <?php if (isset($_SESSION['success'])): ?>
-        <div id="success-alert" class="flex items-center p-4 mb-4 text-teal-800 border border-teal-300 rounded-lg bg-teal-50 shadow-lg transition-opacity duration-500 ease-in-out">
+        <div id="success-alert" class="flex items-center p-4 mb-4 text-green-800 border border-green-400 rounded-lg bg-green-50 shadow-lg transition-opacity duration-500 ease-in-out">
           <i class="fas fa-check-circle text-xl mx-2"></i>
           <span class="mx-4"><?= $_SESSION['success']; ?></span>
-          <button onclick="closeAlert('success-alert')" class="mx-2 text-lg text-teal-800 hover:text-teal-900">
+          <button onclick="closeAlert('success-alert')" class="mx-2 text-lg text-green-800 hover:text-green-900">
             <i class="fas fa-times"></i>
           </button>
         </div>
         <?php unset($_SESSION['success']); ?>
       <?php endif; ?>
       <?php if (isset($_SESSION['error'])): ?>
-        <div id="error-alert" class="flex items-center p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 shadow-lg transition-opacity duration-500 ease-in-out">
-          <i class="fas fa-exclamation-circle text-xl mx-2"></i>
-          <span class="mx-4"><?= $_SESSION['error']; ?></span>
-          <button onclick="closeAlert('error-alert')" class="mx-2 text-lg text-red-800 hover:text-red-900">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <?php unset($_SESSION['error']); ?>
-      <?php endif; ?>
+        <div id="error-alert" class="flex items-center p-4 mb-4 text-red-800 border border-red-400 rounded-lg bg-red-50 shadow-lg transition-opacity duration-500 ease-in-out"></div>
+        <i class="fas fa-exclamation-circle text-xl mx-2"></i>
+        <span class="mx-4"><?= $_SESSION['error']; ?></span>
+        <button onclick="closeAlert('error-alert')" class="mx-2 text-lg text-red-800 hover:text-red-900">
+          <i class="fas fa-times"></i>
+        </button>
     </div>
+    <?php unset($_SESSION['error']); ?>
   <?php endif; ?>
+  </div>
+<?php endif; ?>
 
-  <script>
-    // Close alert manually
-    function closeAlert(id) {
-      document.getElementById(id).classList.add("opacity-0");
-      setTimeout(() => document.getElementById(id).remove(), 500);
-    }
+<script>
+  // Close alert manually
+  function closeAlert(id) {
+    document.getElementById(id).classList.add("opacity-0");
+    setTimeout(() => document.getElementById(id).remove(), 500);
+  }
 
-    // Auto-hide alerts after 5 seconds
-    setTimeout(() => {
-      document.querySelectorAll("#alert-container div").forEach((alert) => {
-        alert.classList.add("opacity-0");
-        setTimeout(() => alert.remove(), 500);
-      });
-    }, 5000);
-  </script>
-  <script>
-    // Mobile sidebar toggle
-    const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
-    const mobileSidebar = document.getElementById('mobileSidebar');
-    mobileSidebarToggle && mobileSidebarToggle.addEventListener('click', () => {
-      mobileSidebar.classList.toggle('translate-x-full');
+  // Auto-hide alerts after 5 seconds
+  setTimeout(() => {
+    document.querySelectorAll("#alert-container div").forEach((alert) => {
+      alert.classList.add("opacity-0");
+      setTimeout(() => alert.remove(), 500);
     });
-  </script>
+  }, 5000);
+</script>
+<script>
+  // Mobile sidebar toggle
+  const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  mobileSidebarToggle && mobileSidebarToggle.addEventListener('click', () => {
+    mobileSidebar.classList.toggle('translate-x-full');
+  });
+</script>
 </body>
 
 </html>

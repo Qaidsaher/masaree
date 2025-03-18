@@ -1,6 +1,6 @@
 <?php
 $title = 'لوحة التحكم - لوحة الطالب';
-$active = 'student.dashboard';
+$active = 'student.home';
 ob_start();
 
 $studentId = auth()->student()->id;

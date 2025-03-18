@@ -15,10 +15,15 @@ class AuthController
             $userType = $_POST['userType']; // Expected values: "student" or "admin"
 
             // Basic validation could be added here
-
-            // Attempt to log in via the Auth instance
+          
             $auth = auth();
-            $result = $auth->login($email, $password, $userType);
+            $isAdmin = false;
+            if($userType==="admin"){
+                $isAdmin = true;
+            }else{
+                $isAdmin = false;
+            }
+            $result = $auth->login($email, $password, $isAdmin);
 
             if ($result) {
                 $_SESSION['success'] = "تم تسجيل الدخول بنجاح";
@@ -44,6 +49,7 @@ class AuthController
     {
        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+         
             $fullName    = trim($_POST['username']);
             $email       = trim($_POST['email']);
             $phoneNumber = trim($_POST['studentId']);
